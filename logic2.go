@@ -1,12 +1,12 @@
 package pipesample
 
-// Logic2Dependency serves as dependency for logic 2.
-type Logic2Dependency interface {
+// ILogic2Dependency serves as dependency for logic 2.
+type ILogic2Dependency interface {
 	TransformLogic2(input uint) (float32, error)
 }
 
 // Logic2 performs logic 2.
-func Logic2(dependency Logic2Dependency) func(
+func Logic2(dependency ILogic2Dependency) func(
 	inputCh <-chan uint,
 ) (<-chan float32, <-chan error) {
 	return func(inputCh <-chan uint) (<-chan float32, <-chan error) {

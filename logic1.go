@@ -1,12 +1,12 @@
 package pipesample
 
-// Logic1Dependency serves as dependency for logic 1.
-type Logic1Dependency interface {
+// ILogic1Dependency serves as dependency for logic 1.
+type ILogic1Dependency interface {
 	TransformLogic1(input string) (int, error)
 }
 
 // Logic1 performs logic 1.
-func Logic1(dependency Logic1Dependency) func(
+func Logic1(dependency ILogic1Dependency) func(
 	inputCh <-chan string,
 ) (<-chan int, <-chan error) {
 	return func(inputCh <-chan string) (<-chan int, <-chan error) {
