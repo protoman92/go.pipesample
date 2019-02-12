@@ -6,8 +6,14 @@ type ILogic2Dependency interface {
 }
 
 // Logic2 performs logic 2.
-func Logic2(dependency ILogic2Dependency) func(uint) (float32, error) {
-	return func(input uint) (float32, error) {
-		return dependency.TransformLogic2(input)
+func Logic2(dependency ILogic2Dependency) Composable {
+	return func(input interface{}) (interface{}, error) {
+		cast, ok := input.(uint)
+
+		if ok {
+			return dependency.TransformLogic2(cast)
+		}
+
+		return nil, castError
 	}
 }

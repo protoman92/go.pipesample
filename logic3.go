@@ -6,8 +6,14 @@ type ILogic3Dependency interface {
 }
 
 // Logic3 performs logic 3.
-func Logic3(dependency ILogic3Dependency) func(bool) (string, error) {
-	return func(input bool) (string, error) {
-		return dependency.TransformLogic3(input)
+func Logic3(dependency ILogic3Dependency) Composable {
+	return func(input interface{}) (interface{}, error) {
+		cast, ok := input.(bool)
+
+		if ok {
+			return dependency.TransformLogic3(cast)
+		}
+
+		return nil, castError
 	}
 }

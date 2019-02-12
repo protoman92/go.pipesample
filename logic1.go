@@ -6,8 +6,14 @@ type ILogic1Dependency interface {
 }
 
 // Logic1 performs logic 1.
-func Logic1(dependency ILogic1Dependency) func(string) (int, error) {
-	return func(input string) (int, error) {
-		return dependency.TransformLogic1(input)
+func Logic1(dependency ILogic1Dependency) Composable {
+	return func(input interface{}) (interface{}, error) {
+		cast, ok := input.(string)
+
+		if ok {
+			return dependency.TransformLogic1(cast)
+		}
+
+		return nil, castError
 	}
 }
