@@ -2,44 +2,28 @@ package pipesample
 
 // Logic1Dependency serves as dependency for logic 1.
 type Logic1Dependency interface {
-	Transform(input string) (int, error)
-}
-
-// Logic1Request serves as a request object for logic 1.
-type Logic1Request struct {
-	input string
-	err   error
-}
-
-// Logic1Response serves as a response object for logic 1.
-type Logic1Response struct {
-	output int
-	err    error
+	TransformLogic1(input string) (int, error)
 }
 
 // Logic1 performs logic 1.
-func Logic1(
-	inputCh <-chan Logic1Request,
-	dependency Logic1Dependency,
-) <-chan Logic1Response {
-	outputCh := make(chan Logic1Response)
-	request := <-inputCh
+func Logic1(dependency Logic1Dependency) func(
+	inputCh <-chan string,
+) (<-chan int, <-chan error) {
+	return func(inputCh <-chan string) (<-chan int, <-chan error) {
+		outputCh := make(chan int)
+		errCh := make(chan error)
+		input := <-inputCh
 
-	go func() {
-		errorOutput := -1
+		go func() {
+			output, err := dependency.TransformLogic1(input)
 
-		if request.err != nil {
-			outputCh <- Logic1Response{output: errorOutput, err: request.err}
-		}
+			if err != nil {
+				errCh <- err
+			}
 
-		output, err := dependency.Transform(request.input)
+			outputCh <- output
+		}()
 
-		if err != nil {
-			outputCh <- Logic1Response{output: errorOutput, err: err}
-		}
-
-		outputCh <- Logic1Response{output: output, err: nil}
-	}()
-
-	return outputCh
+		return outputCh, errCh
+	}
 }
