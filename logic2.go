@@ -14,6 +14,6 @@ func Logic2(dependency ILogic2Dependency) Composable {
 			return dependency.TransformLogic2(cast)
 		}
 
-		return nil, castError
+		return nil, CastError("Logic 2", input)
 	}
 }

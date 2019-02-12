@@ -1,11 +1,10 @@
 package pipesample
 
-import "errors"
-
-var (
-	castError error
+import (
+	"fmt"
 )
 
-func init() {
-	castError = errors.New("Cast failure")
+// CastError returns a cast error.
+func CastError(input ...interface{}) error {
+	return fmt.Errorf("Cast failure %v", input)
 }
