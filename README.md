@@ -1,6 +1,10 @@
 # go.pipesample
 
-Request-response piping sample that demonstrates composition of functions.
+[![Go Report Card](https://goreportcard.com/badge/github.com/protoman92/go.pipesample)](https://goreportcard.com/report/github.com/protoman92/go.pipesample)
+[![Build Status](https://travis-ci.org/protoman92/go.pipesample.svg?branch=master)](https://travis-ci.org/protoman92/go.pipesample)
+[![Coverage Status](https://coveralls.io/repos/github/protoman92/go.pipesample/badge.svg?branch=master)](https://coveralls.io/github/protoman92/go.pipesample?branch=master)
+
+Input-output piping sample that demonstrates composition of functions.
 
 We define a **Composable** as follows:
 
