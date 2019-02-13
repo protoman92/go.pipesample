@@ -3,6 +3,9 @@ package pipesample
 // Composable represents a function that takes input to produce output/error.
 type Composable = func(interface{}) (interface{}, error)
 
+// ComposableMapper represents a Composable converter.
+type ComposableMapper = func(Composable) Composable
+
 // Compose pipes a sequence of functions.
 func Compose(sources []Composable) Composable {
 	return func(input interface{}) (interface{}, error) {

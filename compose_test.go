@@ -27,11 +27,11 @@ func Test_ComposeFunctionsWithAdapters_ShouldSucceed(t *testing.T) {
 
 	// When
 	output, err := Compose([]Composable{
-		Logic1(dependency),
+		Trace(dependency, "Logic1")(Logic1(dependency)),
 		Logic1ToLogic2Adapter(),
-		Logic2(dependency),
+		Trace(dependency, "Logic2")(Logic2(dependency)),
 		Logic2ToLogic3Adapter(),
-		Logic3(dependency),
+		Trace(dependency, "Logic3")(Logic3(dependency)),
 	})("1")
 
 	// Then

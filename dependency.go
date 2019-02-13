@@ -1,15 +1,23 @@
 package pipesample
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 // IDependency serves as dependency for the whole app.
 type IDependency interface {
+	ILogger
 	ILogic1Dependency
 	ILogic2Dependency
 	ILogic3Dependency
 }
 
 type dependency struct{}
+
+func (d *dependency) Log(event interface{}) {
+	fmt.Println(event)
+}
 
 func (d *dependency) TransformLogic1(input string) (int, error) {
 	return strconv.Atoi(input)
