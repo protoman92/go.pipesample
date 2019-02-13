@@ -62,3 +62,49 @@ output, err := Compose([]Composable{
 ```
 
 And since **Compose** also returns a **Composable**, we can keep chaining them endlessly. The entire chain can then be put in a goroutine for async.
+
+To go even more deeply, we can define **ComposableMapper** to wrap a base function with extra functionalities:
+
+```go
+// ComposableMapper represents a Composable converter.
+type ComposableMapper = func(Composable) Composable
+```
+
+For example, we can define a tracer that tracks time spent on invoking a function:
+
+```go
+// ILogger does logging.
+type ILogger interface {
+  Log(event interface{})
+}
+
+// Trace does some tracing for a function with a specified name.
+func Trace(logger ILogger, funcName string) ComposableMapper
+  return func(composable Composable) Composable {
+    return func(input interface{}) (interface{}, error) {
+      startTime := time.Now()
+
+      defer func() {
+        elapsed := time.Now().Sub(startTime)
+        logger.Log(fmt.Sprintf("%v took %v millis to run", funcName, elapsed))
+      }()
+
+      return composable(input)
+    }
+  }
+}
+```
+
+Then in **Compose**:
+
+```go
+output, err := Compose([]Composable{
+  Trace(dependency, "Logic1")(Logic1(dependency)),
+  Logic1ToLogic2Adapter(),
+  Trace(dependency, "Logic2")(Logic2(dependency)),
+  Logic2ToLogic3Adapter(),
+  Trace(dependency, "Logic3")(Logic3(dependency)),
+})("1")
+```
+
+We can even define **ComposeMapper** to chain **ComposableMapper** together like we did with **Composable**.
