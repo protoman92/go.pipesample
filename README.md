@@ -15,20 +15,21 @@ type Composable = (interface{}) (interface{}, error)
 Logic functions should all return **Composable**s. They generally should be in this form:
 
 ```go
-type IDependency interface {
-  TransformLogic(input string) (int, error)
+// ILogic1Dependency serves as dependency for logic 1.
+type ILogic1Dependency interface {
+  TransformLogic1(input string) (int, error)
 }
 
-// Logic performs some logic. Use DI here to keep input/output consistent.
-func Logic(dependency IDependency) Composable {
+// Logic1 performs logic 1.
+func Logic1(dependency ILogic1Dependency) Composable {
   return func(input interface{}) (interface{}, error) {
     cast, ok := input.(string)
 
     if ok {
-      return dependency.TransformLogic(cast)
+      return dependency.TransformLogic1(cast)
     }
 
-    return nil, errors.New("Cast error!")
+    return nil, CastError("Logic 1", input)
   }
 }
 ```
@@ -52,13 +53,13 @@ func Logic1ToLogic2Adapter() Composable {
 Since logic functions and adapters all return **Composable**s, we can use a compose function to chain them:
 
 ```go
-output, err := Compose([]Composable{
+output, err := Compose(
   Logic1(dependency),
   Logic1ToLogic2Adapter(),
   Logic2(dependency),
   Logic2ToLogic3Adapter(),
   Logic3(dependency),
-})("1")
+)("1")
 ```
 
 And since **Compose** also returns a **Composable**, we can keep chaining them endlessly. The entire chain can then be put in a goroutine for async.
@@ -98,13 +99,24 @@ func Trace(logger ILogger, funcName string) ComposableMapper
 Then in **Compose**:
 
 ```go
-output, err := Compose([]Composable{
+output, err := Compose(
   Trace(dependency, "Logic1")(Logic1(dependency)),
   Logic1ToLogic2Adapter(),
   Trace(dependency, "Logic2")(Logic2(dependency)),
   Logic2ToLogic3Adapter(),
   Trace(dependency, "Logic3")(Logic3(dependency)),
-})("1")
+)("1")
 ```
 
-We can even define **ComposeMapper** to chain **ComposableMapper** together like we did with **Composable**.
+We can also define **ComposeMapper** to chain **ComposableMapper** together like we did with **Composable**:
+
+```go
+// When
+output, err := Compose(
+  ComposeMapper(Trace(dependency, "Logic1"), commonMapper)(Logic1(dependency)),
+  Logic1ToLogic2Adapter(),
+  ComposeMapper(Trace(dependency, "Logic2"), commonMapper)(Logic2(dependency)),
+  Logic2ToLogic3Adapter(),
+  ComposeMapper(Trace(dependency, "Logic3"), commonMapper)(Logic3(dependency)),
+)("1")
+```
