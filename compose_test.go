@@ -9,11 +9,11 @@ func Test_ComposeFunctionsWithoutAdapters_ShouldFail(t *testing.T) {
 	dependency := CreateDependency()
 
 	// When
-	_, err := Compose([]Composable{
+	_, err := Compose(
 		Logic1(dependency),
 		Logic2(dependency),
 		Logic3(dependency),
-	})("1")
+	)("1")
 
 	// Then
 	if err == nil {
@@ -26,13 +26,13 @@ func Test_ComposeFunctionsWithAdapters_ShouldSucceed(t *testing.T) {
 	dependency := CreateDependency()
 
 	// When
-	output, err := Compose([]Composable{
-		Trace(dependency, "Logic1")(Logic1(dependency)),
+	output, err := Compose(
+		ComposeMapper(Trace(dependency, "Logic1"))(Logic1(dependency)),
 		Logic1ToLogic2Adapter(),
-		Trace(dependency, "Logic2")(Logic2(dependency)),
+		ComposeMapper(Trace(dependency, "Logic2"))(Logic2(dependency)),
 		Logic2ToLogic3Adapter(),
-		Trace(dependency, "Logic3")(Logic3(dependency)),
-	})("1")
+		ComposeMapper(Trace(dependency, "Logic3"))(Logic3(dependency)),
+	)("1")
 
 	// Then
 	if err != nil {
